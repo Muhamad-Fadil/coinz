@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_coinz/pages/home_page.dart';
 
 class RightSidebar extends StatelessWidget {
   const RightSidebar({super.key});
@@ -8,37 +9,48 @@ class RightSidebar extends StatelessWidget {
     return Drawer(
       child: Column(
         children: [
+          // ===== HEADER =====
           Container(
             height: 120,
             width: double.infinity,
             color: const Color(0xFF7A8C6A),
             padding: const EdgeInsets.all(20),
-            alignment: Alignment.centerRight,
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const SizedBox(height: 30),
+                // ===== ICON HOME (KIRI) =====
+                IconButton(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                      (route) => false,
+                    );
+                  },
+                  icon: const Icon(Icons.home, size: 30, color: Colors.black87),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
 
-                Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(
-                      Icons.arrow_forward,
-                      size: 30,
-                      color: Colors.black87,
-                    ),
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
+                // ===== ICON CLOSE (KANAN) =====
+                IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_forward,
+                    size: 30,
+                    color: Colors.black87,
                   ),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                 ),
               ],
             ),
           ),
+
           const SizedBox(height: 40),
+
           _menu(Icons.library_books_sharp, 'Categories'),
           _menu(Icons.settings, 'Setting'),
           _menu(Icons.chat_bubble_outline, 'Chatbot'),
@@ -54,7 +66,7 @@ class RightSidebar extends StatelessWidget {
         children: [
           Icon(icon, size: 65),
           const SizedBox(height: 6),
-          Text(text, style: TextStyle(fontSize: 18)),
+          Text(text, style: const TextStyle(fontSize: 18)),
         ],
       ),
     );

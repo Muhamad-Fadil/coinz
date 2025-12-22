@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/left_sidebar.dart';
 import '../widgets/right_sidebar.dart';
+import 'category_page.dart';
+import 'transaction_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,125 +16,182 @@ class HomePage extends StatelessWidget {
       drawer: const LeftSidebar(),
       endDrawer: const RightSidebar(),
 
-      body: Column(
-        children: [
-          // HEADER
-          Stack(
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF7A8C6A),
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(60),
+      body: GestureDetector(
+        onVerticalDragEnd: (details) {
+          // SWIPE DARI BAWAH KE ATAS
+          if (details.primaryVelocity != null &&
+              details.primaryVelocity! < -300) {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 400),
+                pageBuilder: (_, animation, __) => const CategoryPage(),
+                transitionsBuilder: (_, animation, __, child) {
+                  return SlideTransition(
+                    position:
+                        Tween<Offset>(
+                          begin: const Offset(0, 1), // dari bawah
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
+                    child: child,
+                  );
+                },
+              ),
+            );
+          }
+        },
+
+        child: Column(
+          children: [
+            // HEADER
+            Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF7A8C6A),
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(60),
+                    ),
+                  ),
+                  child: Column(
+                    children: const [
+                      SizedBox(height: 20),
+                      Text(
+                        'Good Morning',
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Your Money',
+                        style: TextStyle(fontSize: 20, color: Colors.black54),
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        '\$ 10,000,000',
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        '\$ 2,000,000',
+                        style: TextStyle(fontSize: 19, color: Colors.red),
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: const [
-                    SizedBox(height: 20),
-                    Text(
-                      'Good Morning',
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Your Money',
-                      style: TextStyle(fontSize: 20, color: Colors.black54),
-                    ),
-                    SizedBox(height: 12),
-                    Text(
-                      '\$ 10,000,000',
-                      style: TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      '\$ 2,000,000',
-                      style: TextStyle(fontSize: 19, color: Colors.red),
-                    ),
-                  ],
-                ),
-              ),
 
-              // ICON KIRI → SIDEBAR KIRI
-              Positioned(
-                top: 45,
-                left: 20,
-                child: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(
-                      Icons.calendar_today_outlined,
-                      color: Colors.black,
+                // ICON KIRI
+                Positioned(
+                  top: 45,
+                  left: 20,
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Colors.black,
+                      ),
+                      iconSize: 30,
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
                     ),
-                    iconSize: 30,
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
+                  ),
+                ),
+
+                // ICON KANAN
+                Positioned(
+                  top: 45,
+                  right: 20,
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                      iconSize: 30,
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 30),
+
+            // PIE CHART
+            Container(
+              width: 200,
+              height: 200,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+              ),
+              child: CustomPaint(painter: _PiePainter()),
+            ),
+
+            const SizedBox(height: 30),
+
+            // BUTTON
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: const Duration(milliseconds: 350),
+                    pageBuilder: (_, animation, __) => const TransactionPage(),
+                    transitionsBuilder: (_, animation, __, child) {
+                      return SlideTransition(
+                        position:
+                            Tween<Offset>(
+                              begin: const Offset(0, 1), // dari bawah
+                              end: Offset.zero,
+                            ).animate(
+                              CurvedAnimation(
+                                parent: animation,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
+                        child: child,
+                      );
                     },
                   ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6E7F63),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
-
-              // ICON KANAN → SIDEBAR KANAN
-              Positioned(
-                top: 45,
-                right: 20,
-                child: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.more_vert, color: Colors.black),
-                    iconSize: 30,
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 30),
-
-          // PIE CHART
-          Container(
-            width: 200,
-            height: 200,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: CustomPaint(painter: _PiePainter()),
-          ),
-
-          const SizedBox(height: 30),
-
-          // BUTTON
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6E7F63),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              child: const Text(
+                '+ Add Transaction',
+                style: TextStyle(color: Colors.white, fontSize: 17),
               ),
             ),
-            child: const Text(
-              '+ Add Transaction',
-              style: TextStyle(color: Colors.white, fontSize: 17),
-            ),
-          ),
 
-          const SizedBox(height: 30),
+            const SizedBox(height: 30),
 
-          // CATEGORY
-          _categoryItem('Tagihan', '50%'),
-          _categoryItem('Transportasi', '20%'),
-          _categoryItem('Konsumsi', '20%'),
-        ],
+            // CATEGORY
+            _categoryItem('Tagihan', '50%'),
+            _categoryItem('Transportasi', '20%'),
+            _categoryItem('Konsumsi', '20%'),
+          ],
+        ),
       ),
     );
   }

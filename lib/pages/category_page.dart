@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_coinz/pages/transaction_page.dart';
 import 'package:flutter_application_coinz/widgets/left_sidebar.dart';
 import 'package:flutter_application_coinz/widgets/right_sidebar.dart';
 
@@ -11,143 +12,161 @@ class CategoryPage extends StatelessWidget {
       drawer: const LeftSidebar(),
       endDrawer: const RightSidebar(),
       backgroundColor: const Color(0xFFBFD3B6),
-      body: Column(
-        children: [
-          // ===== HEADER =====
-          Stack(
-            children: [
-              // BACKGROUND HEADER
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF7A8C6A),
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(60),
+
+      body: GestureDetector(
+        onVerticalDragEnd: (details) {
+          // SWIPE KE BAWAH → BALIK KE HOME
+          if (details.primaryVelocity != null && details.primaryVelocity! > 0) {
+            Navigator.pop(context);
+          }
+        },
+        child: Column(
+          children: [
+            // ===== HEADER =====
+            Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF7A8C6A),
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(60),
+                    ),
                   ),
-                ),
-                child: Column(
-                  children: const [
-                    SizedBox(height: 10),
-                    Text(
-                      'Balance',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
+                  child: Column(
+                    children: const [
+                      SizedBox(height: 10),
+                      Text(
+                        'Balance',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '\$ 10,000,000',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // ICON KIRI → SIDEBAR KIRI
-              Positioned(
-                top: 45,
-                left: 20,
-                child: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(
-                      Icons.calendar_today_outlined,
-                      color: Colors.black,
-                    ),
-                    iconSize: 30,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onPressed: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                  ),
-                ),
-              ),
-
-              // ICON KANAN → SIDEBAR KANAN
-              Positioned(
-                top: 45,
-                right: 20,
-                child: Builder(
-                  builder: (context) => IconButton(
-                    icon: const Icon(Icons.more_vert, color: Colors.black),
-                    iconSize: 30,
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                    onPressed: () {
-                      Scaffold.of(context).openEndDrawer();
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 25),
-
-          // ===== DROPDOWN FILTER =====
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-              width: 220,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7A8C6A),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: 'All',
-                    isExpanded: true,
-                    items: const [
-                      DropdownMenuItem(value: 'All', child: Text('All')),
-                      DropdownMenuItem(value: 'Income', child: Text('Income')),
-                      DropdownMenuItem(
-                        value: 'Expense',
-                        child: Text('Expense'),
+                      SizedBox(height: 8),
+                      Text(
+                        '\$ 10,000,000',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
-                    onChanged: (value) {},
-                    dropdownColor: const Color(0xFF7A8C6A),
-                    icon: const Icon(Icons.keyboard_arrow_down),
+                  ),
+                ),
+
+                // SIDEBAR KIRI
+                Positioned(
+                  top: 45,
+                  left: 20,
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(
+                        Icons.calendar_today_outlined,
+                        color: Colors.black,
+                      ),
+                      iconSize: 30,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onPressed: () {
+                        Scaffold.of(context).openDrawer();
+                      },
+                    ),
+                  ),
+                ),
+
+                // SIDEBAR KANAN
+                Positioned(
+                  top: 45,
+                  right: 20,
+                  child: Builder(
+                    builder: (context) => IconButton(
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                      iconSize: 30,
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 25),
+
+            // ===== DROPDOWN =====
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SizedBox(
+                width: 220,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF7A8C6A),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: 'All',
+                      isExpanded: true,
+                      items: const [
+                        DropdownMenuItem(value: 'All', child: Text('All')),
+                        DropdownMenuItem(
+                          value: 'Income',
+                          child: Text('Income'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Expense',
+                          child: Text('Expense'),
+                        ),
+                      ],
+                      onChanged: (value) {},
+                      dropdownColor: const Color(0xFF7A8C6A),
+                      icon: const Icon(Icons.keyboard_arrow_down),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          // ===== LIST CATEGORY =====
-          Expanded(
-            child: ListView(
-              children: [
-                _categoryItem('Deposit', '\$10,000,000'),
-                _categoryItem('Tagihan', '20%'),
-                _categoryItem('Transportasi', '20%'),
-                _categoryItem('Entertain', '10%'),
-                _categoryItem('Internet', '10%'),
-                _categoryItem('Investasi', '10%'),
-              ],
-            ),
-          ),
-
-          // ===== ADD BUTTON =====
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20),
-            child: CircleAvatar(
-              radius: 28,
-              backgroundColor: const Color(0xFF7A8C6A),
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.add, size: 28, color: Colors.black),
+            // ===== LIST CATEGORY =====
+            Expanded(
+              child: ListView(
+                children: [
+                  _categoryItem('Deposit', '\$10,000,000'),
+                  _categoryItem('Tagihan', '20%'),
+                  _categoryItem('Transportasi', '20%'),
+                  _categoryItem('Entertain', '10%'),
+                  _categoryItem('Internet', '10%'),
+                  _categoryItem('Investasi', '10%'),
+                ],
               ),
             ),
-          ),
-        ],
+
+            // ===== ADD BUTTON =====
+            Padding(
+              padding: const EdgeInsets.only(bottom: 80),
+              child: CircleAvatar(
+                radius: 28,
+                backgroundColor: const Color(0xFF7A8C6A),
+                child: IconButton(
+                  icon: const Icon(Icons.add, size: 28, color: Colors.black),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const TransactionPage(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

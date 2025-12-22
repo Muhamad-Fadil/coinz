@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'navigation_page.dart';
+import 'package:flutter_application_coinz/pages/home_page.dart';
+// import 'navigation_page.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -25,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const NavigationPage()),
+        MaterialPageRoute(builder: (_) => const HomePage()),
       );
     });
   }
