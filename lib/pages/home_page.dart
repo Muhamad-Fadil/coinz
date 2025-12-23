@@ -1,14 +1,18 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_coinz/view_models/transaksi_controller.dart';
 import '../widgets/left_sidebar.dart';
 import '../widgets/right_sidebar.dart';
 import 'category_page.dart';
 import 'transaction_page.dart';
+import '../widgets/chart_pie.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final sumary = controller.expenseSummary();
     return Scaffold(
       backgroundColor: const Color(0xFFBFD3B6),
 
@@ -130,14 +134,22 @@ class HomePage extends StatelessWidget {
             const SizedBox(height: 30),
 
             // PIE CHART
-            Container(
+            SizedBox(
               width: 200,
               height: 200,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white,
-              ),
-              child: CustomPaint(painter: _PiePainter()),
+              // decoration: const BoxDecoration(
+              //   shape: BoxShape.circle,
+              //   color: Colors.white,
+              // ),
+              child: sumary.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No Data',
+                        style: TextStyle(fontSize: 18, color: Colors.black54),
+                      ),
+                    )
+                  : ExpensePieChart(data: sumary),
+              // child: CustomPaint(painter: _PiePainter()),
             ),
 
             const SizedBox(height: 30),
