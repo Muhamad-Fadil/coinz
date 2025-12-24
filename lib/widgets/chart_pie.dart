@@ -19,11 +19,13 @@ class ExpensePieChart extends StatelessWidget {
       PieChartData(
         sections: filtered.map((e) {
           final category = KategoryData.getById(e.categoryId);
+          final persen = (e.amount / controller.totalExpense()) * 100;
 
           return PieChartSectionData(
             value: e.amount,
-            title: '${category.name}\n${e.amount.toInt()}',
+            title: '${persen.toInt()}%',
             radius: 70,
+            color: category.color,
             titleStyle: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,

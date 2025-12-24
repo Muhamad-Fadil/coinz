@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'splash_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/transaksi_model.dart';
-import 'debug/debug_test.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +10,14 @@ void main() async {
   Hive.registerAdapter(TransactionModelAdapter());
   await Hive.openBox<TransactionModel>('transactions');
 
-  await runDebugTest();
+  final transactionsBox = Hive.box<TransactionModel>('transactions');
+  print('Hive: transactions box opened, length=${transactionsBox.length}');
+  if (transactionsBox.isNotEmpty) {
+    final first = transactionsBox.getAt(0);
+    print('Hive: first transaction exists: $first');
+  }
+
+  // await runDebugTest();
   runApp(const MyApp());
 }
 

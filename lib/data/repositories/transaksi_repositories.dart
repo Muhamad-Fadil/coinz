@@ -10,8 +10,8 @@ class TransaksiRepositories {
     return transaksiBox.values.toList();
   }
 
-  void addTransaction(TransactionModel transaction) {
-    transaksiBox.add(transaction);
+  Future<void> addTransaction(TransactionModel transaction) async {
+    await transaksiBox.add(transaction);
   }
 
   void deleteTransaction(TransactionModel transaction) {

@@ -1,13 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coinz/pages/transaction_page.dart';
+import 'package:flutter_application_coinz/widgets/chart_pie.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_application_coinz/widgets/left_sidebar.dart';
 import 'package:flutter_application_coinz/widgets/right_sidebar.dart';
+import 'package:flutter_application_coinz/data/category_data.dart';
 
-class CategoryPage extends StatelessWidget {
+class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
 
   @override
+  State<CategoryPage> createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends State<CategoryPage> {
+  String selectedType = 'All';
+
+  @override
   Widget build(BuildContext context) {
+    final currency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    final total = controller.balance();
+    final allCats = KategoryData.allCategories();
+    final types = allCats.map((e) => e.type).toSet().toList();
+    final dropdownTypes = ['All', ...types];
+    final displayCats = selectedType == 'All'
+        ? allCats
+        : allCats.where((c) => c.type == selectedType).toList();
+
     return Scaffold(
       drawer: const LeftSidebar(),
       endDrawer: const RightSidebar(),
@@ -35,19 +58,19 @@ class CategoryPage extends StatelessWidget {
                     ),
                   ),
                   child: Column(
-                    children: const [
-                      SizedBox(height: 10),
-                      Text(
+                    children: [
+                      const SizedBox(height: 10),
+                      const Text(
                         'Balance',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        '\$ 10,000,000',
-                        style: TextStyle(
+                        currency.format(total),
+                        style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                         ),
@@ -110,20 +133,24 @@ class CategoryPage extends StatelessWidget {
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
-                      value: 'All',
+                      value: selectedType,
                       isExpanded: true,
-                      items: const [
-                        DropdownMenuItem(value: 'All', child: Text('All')),
-                        DropdownMenuItem(
-                          value: 'Income',
-                          child: Text('Income'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Expense',
-                          child: Text('Expense'),
-                        ),
-                      ],
-                      onChanged: (value) {},
+                      items: dropdownTypes
+                          .map(
+                            (t) => DropdownMenuItem(
+                              value: t,
+                              child: Text(
+                                t == 'All'
+                                    ? 'All'
+                                    : '${t[0].toUpperCase()}${t.substring(1)}',
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) return;
+                        setState(() => selectedType = value);
+                      },
                       dropdownColor: const Color(0xFF7A8C6A),
                       icon: const Icon(Icons.keyboard_arrow_down),
                     ),
@@ -135,14 +162,14 @@ class CategoryPage extends StatelessWidget {
             // ===== LIST CATEGORY =====
             Expanded(
               child: ListView(
-                children: [
-                  _categoryItem('Deposit', '\$10,000,000'),
-                  _categoryItem('Tagihan', '20%'),
-                  _categoryItem('Transportasi', '20%'),
-                  _categoryItem('Entertain', '10%'),
-                  _categoryItem('Internet', '10%'),
-                  _categoryItem('Investasi', '10%'),
-                ],
+                children: displayCats
+                    .map(
+                      (c) => _categoryItem(
+                        c.name,
+                        currency.format(controller.totalForCategory(c.id)),
+                      ),
+                    )
+                    .toList(),
               ),
             ),
 
@@ -211,6 +238,14 @@ class CategoryPage extends StatelessWidget {
         return Icons.receipt_long;
       case 'transportasi':
         return Icons.directions_car;
+      case 'konsumsi':
+        return Icons.restaurant;
+      case 'dana darurat':
+        return Icons.savings;
+      case 'job':
+        return Icons.work;
+      case 'pemberian':
+        return Icons.card_giftcard;
       case 'entertain':
         return Icons.movie;
       case 'internet':

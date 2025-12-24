@@ -22,28 +22,24 @@ Future<void> runDebugTest() async {
       categoryId: 1,
       type: 'expense',
       date: DateTime.now(),
-      note: 'Electricity Bill',
     ),
     TransactionModel(
       amount: 200000,
       categoryId: 101,
       type: 'income',
       date: DateTime.now(),
-      note: 'Freelance Job',
     ),
     TransactionModel(
       amount: 75000,
       categoryId: 2,
       type: 'expense',
       date: DateTime.now(),
-      note: 'Groceries',
     ),
     TransactionModel(
       amount: 150000,
       categoryId: 102,
       type: 'income',
       date: DateTime.now(),
-      note: 'Part-time Work',
     ),
   ];
 
