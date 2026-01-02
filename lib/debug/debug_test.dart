@@ -1,57 +1,105 @@
-import 'package:hive/hive.dart';
-import '../view_models/transaksi_controller.dart';
-import '../models/transaksi_model.dart';
-import '../data/category_data.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../view_models/gemini_controller.dart';
+import '../models/message_model.dart';
 
-Future<void> runDebugTest() async {
-  final transaksiController = TransaksiController();
-  Box<TransactionModel> transactionsBox;
-  try {
-    transactionsBox = await Hive.openBox<TransactionModel>('transactions');
-    print('runDebugTest: opened box transactions');
-  } catch (e) {
-    print('runDebugTest: openBox error: $e');
-    rethrow;
-  }
+class DebugTest extends StatelessWidget {
+  DebugTest({super.key});
 
-  await transactionsBox.clear();
+  final TextEditingController _controller = TextEditingController();
 
-  final testData = [
-    TransactionModel(
-      amount: 50000,
-      categoryId: 1,
-      type: 'expense',
-      date: DateTime.now(),
-    ),
-    TransactionModel(
-      amount: 200000,
-      categoryId: 101,
-      type: 'income',
-      date: DateTime.now(),
-    ),
-    TransactionModel(
-      amount: 75000,
-      categoryId: 2,
-      type: 'expense',
-      date: DateTime.now(),
-    ),
-    TransactionModel(
-      amount: 150000,
-      categoryId: 102,
-      type: 'income',
-      date: DateTime.now(),
-    ),
-  ];
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<GeminiViewModel>();
 
-  await transactionsBox.addAll(testData);
-  print('runDebugTest: added ${testData.length} test transactions');
-  print('runDebugTest: transactionsBox.length = ${transactionsBox.length}');
+    return Scaffold(
+      appBar: AppBar(title: const Text('Chatbot')),
+      body: Column(
+        children: [
+          Expanded(
+            child: vm.messages.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.chat_bubble_outline,
+                          size: 56,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Belum ada pesan. Ketik dan tekan kirim.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        if (vm.error.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            'Error: ${"${vm.error}"}',
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ],
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(12),
+                    itemCount: vm.messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = vm.messages[index];
+                      final isUser = msg.role == ChatRole.user;
 
-  print('TOTAL TRANSAKSI: ${transactionsBox.length}');
+                      return Align(
+                        alignment: isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: isUser
+                                ? Colors.blue.shade100
+                                : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(msg.message),
+                        ),
+                      );
+                    },
+                  ),
+          ),
 
-  final expenseSummary = transaksiController.expenseSummary();
-  for (var summary in expenseSummary) {
-    final category = KategoryData.getById(summary.categoryId);
-    print('Category: ${category.name}, Total: ${summary.amount}');
+          if (vm.isLoading)
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: CircularProgressIndicator(),
+            ),
+
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: 'Tulis pesan...',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: () {
+                    final text = _controller.text;
+                    _controller.clear();
+                    vm.sendMessage(text);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
