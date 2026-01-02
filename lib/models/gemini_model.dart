@@ -5,40 +5,31 @@ class GeminiService {
   final String apiKey;
   GenerativeModel? _model;
 
-  GeminiService([String? key]) : apiKey = key ?? (dotenv.env['API_KEY'] ?? '') {
-    final display = apiKey.isEmpty ? 'EMPTY' : 'loaded';
-    print('GeminiService: apiKey $display (len=${apiKey.length})');
+  GeminiService([String? key])
+      : apiKey = key ?? (dotenv.env['API_KEY'] ?? '') {
     if (apiKey.isEmpty) {
-      // do not throw here; allow app to run and surface errors when sending
-      print('GeminiService warning: API_KEY kosong');
+      print('⚠️ GeminiService: API_KEY kosong');
+    } else {
+      print('✅ GeminiService: API_KEY loaded (${apiKey.length} chars)');
     }
   }
 
   GenerativeModel _getModel() {
-    _model ??= GenerativeModel(model: 'gemini-2.5-flash', apiKey: apiKey);
+    _model ??= GenerativeModel(
+      model: 'gemini-2.5-flash',
+      apiKey: apiKey,
+    );
     return _model!;
   }
 
   Future<String> sendMessage(String message) async {
     if (apiKey.isEmpty) {
-      throw Exception('API key is empty; set API_KEY in .env');
+      throw Exception('API_KEY belum diset di .env');
     }
 
-    try {
-      print('GeminiService: sending message (len=${message.length})');
-      final model = _getModel();
-      final response = await model.generateContent([Content.text(message)]);
-      print('GeminiService: raw response => $response');
+    final response =
+        await _getModel().generateContent([Content.text(message)]);
 
-      final respText = response.text ?? '';
-      if (respText.isEmpty) {
-        print('GeminiService: response text empty');
-        return 'Tidak ada respon (kosong)';
-      }
-      return respText;
-    } catch (e, st) {
-      print('GeminiService error: $e\n$st');
-      throw Exception('GeminiService error: $e');
-    }
+    return response.text ?? 'Tidak ada respon';
   }
 }
