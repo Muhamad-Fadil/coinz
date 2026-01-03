@@ -10,6 +10,26 @@ class TransaksiRepositories {
     return transaksiBox.values.toList();
   }
 
+  /// 🔑 UBAH DATA JADI TEKS UNTUK AI
+  String buildContextForAI() {
+    final txs = getAllTransactions();
+
+    if (txs.isEmpty) {
+      return 'Database transaksi kosong.';
+    }
+
+    return txs
+        .map((t) {
+          return '''
+- Tanggal: ${t.date.toIso8601String()}
+- Jumlah: ${t.amount}
+- Tipe: ${t.type}
+- CategoryId: ${t.categoryId}
+''';
+        })
+        .join('\n');
+  }
+
   Future<void> addTransaction(TransactionModel transaction) async {
     await transaksiBox.add(transaction);
   }

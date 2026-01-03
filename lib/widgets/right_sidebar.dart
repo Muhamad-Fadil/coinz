@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_coinz/debug/debug_test.dart';
 import 'package:flutter_application_coinz/pages/home_page.dart';
 
 class RightSidebar extends StatelessWidget {
@@ -51,17 +52,29 @@ class RightSidebar extends StatelessWidget {
 
           const SizedBox(height: 40),
 
-          _menu(Icons.library_books_sharp, 'Categories'),
-          _menu(Icons.settings, 'Setting'),
-          _menu(Icons.chat_bubble_outline, 'Chatbot'),
+          _menu(context, Icons.library_books_sharp, 'Categories',  DebugTest()),
+          _menu(context, Icons.settings, 'Setting', DebugTest()),
+          _menu(context, Icons.chat_bubble_outline, 'Chatbot', DebugTest()),
         ],
       ),
     );
   }
 
-  Widget _menu(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+  Widget _menu(
+  BuildContext context,
+  IconData icon,
+  String text,
+  Widget page,
+) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    child: InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => page),
+        );
+      },
       child: Column(
         children: [
           Icon(icon, size: 65),
@@ -69,6 +82,8 @@ class RightSidebar extends StatelessWidget {
           Text(text, style: const TextStyle(fontSize: 18)),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

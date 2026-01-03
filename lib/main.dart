@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_application_coinz/splash_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'CoinZ',
       theme: ThemeData(useMaterial3: true, fontFamily: 'K2D'),
-      home: DebugTest(), // halaman chat kamu
+      home: SplashScreen(), // halaman chat kamu
     );
   }
 }
