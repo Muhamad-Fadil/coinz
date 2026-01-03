@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_coinz/pages/home_page.dart';
+import 'package:flutter_application_coinz/debug/debug_test.dart';
+import 'package:flutter_application_coinz/pages/category_page.dart';
 import 'package:flutter_application_coinz/pages/chat_bot_page.dart';
+import 'package:flutter_application_coinz/pages/home_page.dart';
 
 class RightSidebar extends StatelessWidget {
   const RightSidebar({super.key});
@@ -19,7 +21,7 @@ class RightSidebar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ===== HOME =====
+                // ===== ICON HOME (KIRI) =====
                 IconButton(
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
@@ -28,13 +30,23 @@ class RightSidebar extends StatelessWidget {
                       (route) => false,
                     );
                   },
-                  icon: const Icon(Icons.home, size: 30),
+                  icon: const Icon(Icons.home, size: 30, color: Colors.black87),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                 ),
 
-                // ===== CLOSE =====
+                // ===== ICON CLOSE (KANAN) =====
                 IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_forward, size: 30),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.arrow_forward,
+                    size: 30,
+                    color: Colors.black87,
+                  ),
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
                 ),
               ],
             ),
@@ -42,34 +54,21 @@ class RightSidebar extends StatelessWidget {
 
           const SizedBox(height: 40),
 
-          _menu(Icons.library_books_sharp, 'Categories'),
-
-          _menu(Icons.settings, 'Setting'),
-
-          _menu(
-            Icons.chat_bubble_outline,
-            'Chatbot',
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const ChatBotPage(),
-                ),
-              );
-            },
-          ),
+          _menu(context, Icons.library_books_sharp, 'Categories', CategoryPage()),
+          // _menu(context, Icons.settings, 'Setting', DebugTest()),
+          _menu(context, Icons.chat_bubble_outline, 'Chatbot', ChatBotPage()),
         ],
       ),
     );
   }
 
-  Widget _menu(IconData icon, String text, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 18),
+  Widget _menu(BuildContext context, IconData icon, String text, Widget page) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+        },
         child: Column(
           children: [
             Icon(icon, size: 65),

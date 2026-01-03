@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../widgets/left_sidebar.dart';
 import '../widgets/right_sidebar.dart';
+import '../widgets/chart_pie.dart';
+import 'home_page.dart';
+import '../data/category_data.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key});
@@ -13,33 +15,40 @@ class TransactionPage extends StatefulWidget {
 class _TransactionPageState extends State<TransactionPage> {
   bool isIncome = true;
   String rawAmount = "";
-  String selectedCategory = "Food";
+  late String selectedCategory;
   final TextEditingController noteController = TextEditingController();
 
   double? firstNumber;
   String? operator;
 
-  final List<String> categories = [
-    "Food",
-    "Transport",
-    "Internet",
-    "Entertainment",
-    "Bill",
-    "Investment",
-  ];
+  List<String> get categories =>
+      (isIncome ? KategoryData.incategories : KategoryData.excategories)
+          .map((c) => c.name)
+          .toList();
+
+  @override
+  void initState() {
+    super.initState();
+    selectedCategory = categories.isNotEmpty ? categories.first : '';
+  }
 
   String get formattedAmount {
-    if (rawAmount.isEmpty) return "0";
+    final currency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+
+    if (rawAmount.isEmpty) return currency.format(0);
     final number = double.tryParse(rawAmount.replaceAll(',', ''));
     if (number == null) return rawAmount;
-    return NumberFormat("#,###").format(number);
+    return currency.format(number);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFBFD3B6),
-      drawer: const LeftSidebar(),
       endDrawer: const RightSidebar(),
       body: SafeArea(
         child: Column(
@@ -109,7 +118,10 @@ class _TransactionPageState extends State<TransactionPage> {
                 children: [
                   DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
-                      value: selectedCategory,
+                      value: categories.contains(selectedCategory)
+                          ? selectedCategory
+                          : null,
+                      hint: const Text('Select'),
                       items: categories
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
@@ -145,25 +157,6 @@ class _TransactionPageState extends State<TransactionPage> {
             ),
 
             const SizedBox(height: 15),
-
-            // ===== NOTE =====
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: TextField(
-                controller: noteController,
-                decoration: InputDecoration(
-                  hintText: "Add note...",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 25),
 
             // INCOME / EXPENSE SWITCH
             Padding(
@@ -204,10 +197,10 @@ class _TransactionPageState extends State<TransactionPage> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (rawAmount.isEmpty) return;
 
-                          // SIMPAN TRANSAKSI (nanti bisa ke DB)
+                          // log values
                           debugPrint("Amount: $rawAmount");
                           debugPrint("Category: $selectedCategory");
                           debugPrint("Note: ${noteController.text}");
@@ -215,7 +208,36 @@ class _TransactionPageState extends State<TransactionPage> {
                             "Type: ${isIncome ? "Income" : "Expense"}",
                           );
 
-                          Navigator.pop(context);
+                          // prepare data for repository
+                          final amount =
+                              double.tryParse(rawAmount.replaceAll(',', '')) ??
+                              0.0;
+                          final type = isIncome ? 'income' : 'expense';
+                          final allCats = [
+                            ...KategoryData.excategories,
+                            ...KategoryData.incategories,
+                          ];
+                          final cat = allCats.firstWhere(
+                            (c) => c.name == selectedCategory,
+                            orElse: () => allCats.first,
+                          );
+                          final categoryId = int.tryParse(cat.id) ?? 0;
+
+                          await controller.addTransaction(
+                            amount: amount,
+                            type: type,
+                            categoryId: categoryId,
+                            date: DateTime.now(),
+                            note: noteController.text.isEmpty
+                                ? null
+                                : noteController.text,
+                          );
+
+                          // navigate back to HomePage and rebuild it
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const HomePage()),
+                          );
                         },
                         child: const Text(
                           "ENTER",
@@ -270,7 +292,12 @@ class _TransactionPageState extends State<TransactionPage> {
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() => isIncome = true),
+                  onTap: () => setState(() {
+                    isIncome = true;
+                    selectedCategory = categories.isNotEmpty
+                        ? categories.first
+                        : '';
+                  }),
                   child: Center(
                     child: Text(
                       "Income",
@@ -286,7 +313,12 @@ class _TransactionPageState extends State<TransactionPage> {
               Expanded(
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => setState(() => isIncome = false),
+                  onTap: () => setState(() {
+                    isIncome = false;
+                    selectedCategory = categories.isNotEmpty
+                        ? categories.first
+                        : '';
+                  }),
                   child: Center(
                     child: Text(
                       "Expense",
