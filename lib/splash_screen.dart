@@ -40,15 +40,15 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF6F8064),
+      backgroundColor: const Color(0xFF66785F),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // LOGO TENGAH
-            Image.asset('assets/logo.png', width: 300),
+            Image.asset('assets/fix.png', width: 200),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 100),
 
             // LOADING BULAT MUTER
             RotationTransition(

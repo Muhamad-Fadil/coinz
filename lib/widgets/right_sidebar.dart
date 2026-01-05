@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_coinz/debug/debug_test.dart';
+// import 'package:flutter_application_coinz/debug/debug_test.dart';
 import 'package:flutter_application_coinz/pages/category_page.dart';
 import 'package:flutter_application_coinz/pages/chat_bot_page.dart';
 import 'package:flutter_application_coinz/pages/home_page.dart';

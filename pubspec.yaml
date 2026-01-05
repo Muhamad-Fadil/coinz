@@ -44,10 +44,22 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   build_runner: ^2.4.6
   hive_generator: ^2.0.1
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: true
+  ios: true
+
+  # ANDROID (adaptive icon)
+  adaptive_icon_foreground: assets/fix.png
+  adaptive_icon_background: assets/icons-bg.png
+
+  # iOS (WAJIB ADA)
+  image_path: assets/icons-app.png
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -63,6 +75,8 @@ dev_dependencies:
 flutter:
   assets:
     - assets/logo.png
+    - assets/fix.png
+    - assets/icons-app.png
     - .env
 
   fonts:

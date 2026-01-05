@@ -103,8 +103,8 @@ class HomePage extends StatelessWidget {
                             ' ${currency.format(expenses)}',
                             style: const TextStyle(
                               fontSize: 19,
-                              color: Color.fromARGB(255, 0, 0, 0),
-                              backgroundColor: Colors.red,
+                              color: Color.fromARGB(255, 168, 1, 1),
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ],
