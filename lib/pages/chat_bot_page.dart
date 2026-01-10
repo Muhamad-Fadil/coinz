@@ -17,6 +17,53 @@ class _ChatBotPageState extends State<ChatBotPage> {
   Widget build(BuildContext context) {
     final vm = context.watch<GeminiViewModel>();
 
+    // If there's an error from the AI service, show an alert then clear it (with Retry for network)
+    final error = vm.error;
+    if (error.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final isLimit = _isLimitError(error);
+        final isNetwork = _isNetworkError(error);
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text(
+              isNetwork
+                  ? 'Tidak Ada Koneksi'
+                  : isLimit
+                  ? 'Batas AI Terpenuhi'
+                  : 'Terjadi Kesalahan',
+            ),
+            content: Text(
+              isNetwork
+                  ? 'Sepertinya perangkat tidak tersambung ke internet. Periksa koneksi dan coba lagi.'
+                  : isLimit
+                  ? 'Permintaan terhambat karena batas penggunaan AI tercapai. Silakan coba lagi nanti atau periksa kuota API Anda.'
+                  : 'Terjadi kesalahan: $error',
+            ),
+            actions: [
+              if (isNetwork)
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    vm.clearError();
+                    vm.retryLast();
+                  },
+                  child: const Text('Retry'),
+                ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  vm.clearError();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -134,5 +181,24 @@ class _ChatBotPageState extends State<ChatBotPage> {
         ],
       ),
     );
+  }
+
+  bool _isLimitError(String msg) {
+    final s = msg.toLowerCase();
+    return s.contains('rate limit') ||
+        s.contains('quota') ||
+        s.contains('429') ||
+        s.contains('too many requests') ||
+        s.contains('limit') ||
+        s.contains('exceeded');
+  }
+
+  bool _isNetworkError(String msg) {
+    final s = msg.toLowerCase();
+    return s.contains('socketexception') ||
+        s.contains('failed host') ||
+        s.contains('no address') ||
+        s.contains('network') ||
+        s.contains('network:');
   }
 }

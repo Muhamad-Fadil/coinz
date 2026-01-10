@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_coinz/data/category_data.dart';
 import '../models/message_model.dart';
@@ -14,6 +15,7 @@ class GeminiViewModel extends ChangeNotifier {
   final List<ChatMessageModel> _messages = [];
   bool _isLoading = false;
   String _error = '';
+  String? _lastPrompt;
 
   List<ChatMessageModel> get messages => _messages;
   bool get isLoading => _isLoading;
@@ -22,6 +24,9 @@ class GeminiViewModel extends ChangeNotifier {
   Future<void> sendMessage(String text) async {
     final userPrompt = text.trim();
     if (userPrompt.isEmpty) return;
+
+    // Save for retry if needed
+    _lastPrompt = userPrompt;
 
     _messages.add(ChatMessageModel(role: ChatRole.user, message: userPrompt));
     notifyListeners();
@@ -62,11 +67,31 @@ $userPrompt
 
       _messages.add(ChatMessageModel(role: ChatRole.bot, message: reply));
     } catch (e) {
-      _error = e.toString();
+      // Network issues often surface as SocketException / host lookup failures
+      if (e is SocketException ||
+          e.toString().toLowerCase().contains('failed host') ||
+          e.toString().toLowerCase().contains('socketexception')) {
+        _error =
+            'NETWORK: Tidak ada koneksi internet. Periksa sambungan dan coba lagi. (${e.toString()})';
+      } else {
+        _error = e.toString();
+      }
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // Allow UI to clear last error after showing it
+  void clearError() {
+    _error = '';
+    notifyListeners();
+  }
+
+  // Retry the last prompt if available
+  Future<void> retryLast() async {
+    if (_lastPrompt == null || _lastPrompt!.isEmpty) return;
+    await sendMessage(_lastPrompt!);
   }
 }
 

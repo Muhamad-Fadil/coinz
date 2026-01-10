@@ -23,13 +23,42 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 1),
     )..repeat();
 
-    Timer(const Duration(seconds: 2), () {
+    // Start initialization and navigate only when it's finished
+    _initializeAndNavigate();
+  }
+
+  Future<void> _initializeAndNavigate() async {
+    try {
+      // TODO: replace these fake loads with real initialization (API, DB, auth, etc.)
+      await Future.wait([
+        _fakeLoad(const Duration(milliseconds: 1500)),
+        _fakeLoad(const Duration(milliseconds: 500)),
+      ]);
+
+      // Stop the spinner and navigate
+      _controller.stop();
+      if (!mounted) return;
+
+      // Small pause so user sees the final state
+      await Future.delayed(const Duration(milliseconds: 300));
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomePage()),
       );
-    });
+    } catch (e) {
+      // On error, stop the spinner and still proceed to home
+      _controller.stop();
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomePage()),
+      );
+    }
   }
+
+  // Helper fake load -- replace with real async work
+  Future<void> _fakeLoad(Duration d) => Future.delayed(d);
 
   @override
   void dispose() {
